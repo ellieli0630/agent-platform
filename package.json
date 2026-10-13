@@ -1,13 +1,16 @@
 {
-  "name": "agent-platform",
-  "type": "module",
+  "name": "gather-agent",
+  "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "start": "bun run src/index.ts",
-    "dev": "bun --watch run src/index.ts",
-    "test": "bun test test/unit.test.ts",
-    "test:live": "LIVE=1 bun test test/live.test.ts",
-    "typecheck": "tsc --noEmit -p ."
+    "dev": "bun --watch server/index.ts",
+    "start": "bun server/index.ts",
+    "demo": "bun scripts/demo.ts",
+    "test": "bun test test/",
+    "typecheck": "tsc --noEmit",
+    "build": "bun build client/app.tsx --outdir dist --minify",
+    "try": "bun --env-file=.env.live scripts/try.ts"
   },
   "dependencies": {
     "@clerk/backend": "^3.23.2",
@@ -15,17 +18,13 @@
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "spectrum-ts": "^12.10.1",
+    "playwright-core": "^1.56.0",
     "unpdf": "^1.8.1"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/react": "^19.3.0",
-    "@types/react-dom": "^19.3.0"
-  },
-  "peerDependencies": {
+    "@types/react-dom": "^19.3.0",
     "typescript": "^5"
-  },
-  "patchedDependencies": {
-    "@photon-ai/imessage-kit@3.0.0": "patches/@photon-ai%2Fimessage-kit@3.0.0.patch"
   }
 }
