@@ -1,8 +1,8 @@
-import { db, time, json, first, demo } from "./store";
+import { db, time, json, first, demo, localTest } from "./store";
 import type { Completion, ChatMessage } from "./model";
 export async function seedDemo() {
   if (
-    !demo ||
+    (!demo && !localTest) ||
     (await first(db`select 1 from gather_people where id='demo_alex'`))
   )
     return;

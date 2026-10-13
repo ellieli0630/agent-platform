@@ -1,8 +1,8 @@
-# Gather
+# agents — shared personal agents
 
 A shared helping hand for family, friends and neighbors. One person creates and trains an agent; everyone in the group can ask for help. Gather coordinates responsibilities, keeps a plan when work has dependencies, and asks the right person before using an account, contacting a business or sharing private results.
 
-This is a fresh implementation of the agent-platform product specification. Server, client, schema, tools and tests were rebuilt. No previous application code or database records are required.
+The backend, schema, tools and runtime are rebuilt from the agent-platform specification. The frontend reuses the original repository’s sticker hero, animated eyes, phone illustration, fonts and lime/ink design system, then extends it with shared responsibilities, approvals and resumable plans. Previous database records are not required.
 
 ## Try it locally
 
@@ -18,6 +18,16 @@ bun run demo
 Open **http://localhost:3100**. The demo uses fictional people and a scripted model; outbound providers are disabled. Responsibilities, memories, approvals and plans persist in the separate local demo database. It is an interactive product preview, not evidence that a real search, call or booking occurred.
 
 For live mode, fill in `MASTER_KEY`, `CLERK_SECRET_KEY`, `CLERK_PUBLISHABLE_KEY`, `OPENROUTER_API_KEY` and the public origin in `.env`, then run `bun run dev`. Generate the encryption key with `openssl rand -hex 32`. Keep it stable and backed up. Configure Clerk to permit the app's origin. Live mode starts empty: sign in, create an agent, teach it three private memories, create a group and invite someone. Invited members share the existing agent. Private training memories are never automatically copied into that group.
+
+## Test real GLM 5.3 without login
+
+Create `.env.live` with your local PostgreSQL URL and OpenRouter key (you can use `.env.example` as a template), then run:
+
+```sh
+bun run try
+```
+
+Open **http://localhost:3102/#/app**, or **http://localhost:3102/#/create** to create an agent directly. This local mode uses real `z-ai/glm-5.3`, seeds fictional records in a separate `gather_preview` database, bypasses Clerk, and disables outbound providers. It binds to 127.0.0.1, rejects cross-origin requests, refuses a live database and cannot run in production. The default preflight model budget is $0.15 per day, configurable with `LOCAL_TEST_BUDGET_USD`. It is separate from the scripted demo and the normal Clerk-authenticated app. The normal app uses `CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`; local testing does not require either.
 
 ## What works
 

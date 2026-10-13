@@ -10,6 +10,7 @@ import {
   seal,
   digest,
   demo,
+  localTest,
   event,
 } from "./store";
 import { authenticate } from "./auth";
@@ -64,6 +65,7 @@ export async function handleApi(req: Request): Promise<Response> {
         agents,
         spaces,
         demo,
+        localTest,
         integrations: integrationStatus(),
       };
     } else if ((m = match(/^\/api\/spaces\/([^/]+)\/invites$/)) && isPost) {
@@ -229,7 +231,11 @@ export async function handleApi(req: Request): Promise<Response> {
       result =
         await db`select id,kind,name,status,config->>'sendAsMe' send_as_me from gather_connections where owner_id=${person.id} order by kind`;
     else if (path === "/api/connections/mcp" && isPost) {
-      demand(!demo, 409, "Connect devices in a live workspace.");
+      demand(
+        !demo && !localTest,
+        409,
+        "Connect devices in a signed-in live workspace.",
+      );
       result = await addMcp(person.id, input);
     } else if ((m = match(/^\/api\/connections\/([^/]+)$/)) && isPut) {
       await db`update gather_connections set config=jsonb_set(config,'{sendAsMe}',${json(input.sendAsMe === true)}::text::jsonb) where id=${m[1]} and owner_id=${person.id} and kind='google'`;
@@ -243,6 +249,7 @@ export async function handleApi(req: Request): Promise<Response> {
     } else if (path === "/api/connections/google" && isPost) {
       demand(
         !demo &&
+          !localTest &&
           process.env.GOOGLE_CLIENT_ID &&
           process.env.GOOGLE_CLIENT_SECRET,
         503,

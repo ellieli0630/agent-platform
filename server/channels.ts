@@ -4,6 +4,7 @@ import {
   uid,
   time,
   demo,
+  localTest,
   json,
   digest,
   demand,
@@ -27,11 +28,13 @@ export function integrationStatus() {
       !!process.env.VAPI_PHONE_NUMBER_ID,
     imessage: channelState.imessage,
     demo,
+    localTest,
   };
 }
 export async function startChannels() {
   if (
     demo ||
+    localTest ||
     !process.env.PHOTON_PROJECT_ID ||
     !process.env.PHOTON_PROJECT_SECRET
   )

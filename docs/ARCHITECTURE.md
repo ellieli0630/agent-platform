@@ -10,7 +10,7 @@ For a Mandarin-speaking handyman, the agent can search English and Chinese terms
 
 ## Small runtime, explicit contracts
 
-Bun serves a React interface and authenticated JSON API. PostgreSQL stores all durable state in `gather_*` tables. OpenRouter receives a normal chat/tool loop; there is no mandatory planner or judge call. Simple replies use the cheap configured model. Writes or longer tool sequences upgrade subsequent turns to the smart model. Local scripts and two concise skills hold workflow guidance.
+Bun serves a React interface and authenticated JSON API. PostgreSQL stores all durable state in `gather_*` tables. OpenRouter receives a normal chat/tool loop; there is no mandatory planner or judge call. Simple replies do not require a planner turn. Both the cheap and smart runtime tiers default to GLM 5.3 through OpenRouter; tiering still lets deployments configure different models later. Local scripts and two concise skills hold workflow guidance.
 
 A run stores its transcript and pending tool calls before executing them. Workers claim runs with a lease and renew it while active. An execution fingerprint includes the run, tool and canonical input. Atomic reservation avoids duplicate execution by concurrent workers. A process restart reuses the pending call and its recorded outcome. A started or unknown write is not retried automatically. This is a conservative delivery strategy, not an exactly-once guarantee across arbitrary providers.
 
@@ -49,3 +49,7 @@ References: [Wajo Fo](https://wajo.ai/fo), [REA](https://github.com/morluto/rea)
 ## Boundaries of this release
 
 The plan is model-selected; runtime checks enforce dependency order and evidence, while the prompt guides channel switching. They cannot guarantee good judgment or factual interpretation. The completion-language guard catches several unsupported action claims but is not a general semantic proof. Browser write results remain unknown because a replay alone cannot prove an external transaction. The app currently supports web and Photon iMessage, not production WhatsApp, WeChat, Telegram or Slack delivery. Account-wide cost checks happen before each call; concurrent in-flight requests can exceed the threshold. Due-task nudges are best effort across a crash. There is no production deletion/export admin surface, spending integration, medical decision engine or automated identity-history merge.
+
+## Original repository UI
+
+The interface now builds on agent-platform main at `abd82c9`: `client/RepositoryLanding.tsx` adapts its sticker lettering, eyes, phone illustration and training introduction; `client/styles.css` retains its original design system and `client/icon.svg` retains its icon. `client/enhancements.css` styles the new workflow views in that language. The navigation keeps Home, Agents, Deploy, Chats, Connections, Reminders, Activity and preferences, adding shared responsibilities and memory. Home retains Need your input / On radar / Last activity. The fictional phone conversation and landing claims are updated to the implemented family workflows.

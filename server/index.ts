@@ -1,4 +1,4 @@
-import { db, migrate, demo, demand, first, time } from "./store";
+import { db, migrate, demo, localTest, demand, first, time } from "./store";
 import { seedDemo } from "./demo";
 import { handleApi, googleCallback } from "./api";
 import { worker, pollCalls } from "./engine";
@@ -19,6 +19,7 @@ if (process.env.NODE_ENV === "production")
 await migrate();
 await seedDemo();
 const server = Bun.serve({
+  hostname: demo || localTest ? "127.0.0.1" : undefined,
   maxRequestBodySize: 10 * 1024 * 1024,
   port: Number(process.env.PORT ?? 3100),
   routes: {
@@ -26,9 +27,12 @@ const server = Bun.serve({
     "/config": () =>
       Response.json({
         demo,
-        clerkKey: process.env.CLERK_PUBLISHABLE_KEY ?? null,
+        localTest,
+        clerkKey: localTest
+          ? null
+          : (process.env.CLERK_PUBLISHABLE_KEY ?? null),
       }),
-    "/health": () => Response.json({ ok: true, demo }),
+    "/health": () => Response.json({ ok: true, demo, localTest }),
     "/api/*": handleApi,
     "/oauth/google": async (req) => {
       try {
@@ -63,7 +67,7 @@ setInterval(tick, 1500);
 void tick();
 // Background profile maintenance, independent of responding. No write-side model call on the chat critical path.
 setInterval(async () => {
-  if (demo || !process.env.OPENROUTER_API_KEY) return;
+  if (demo || localTest || !process.env.OPENROUTER_API_KEY) return;
   const owners =
     await db`select distinct m.agent_id,m.owner_id from gather_memories m left join gather_profiles p on p.agent_id=m.agent_id and p.owner_id=m.owner_id where m.owner_id is not null and (p.updated_at is null or p.updated_at<${time() - 86400000}) limit 10`;
   for (const m of owners)

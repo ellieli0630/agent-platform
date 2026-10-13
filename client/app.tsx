@@ -1,7 +1,10 @@
 import { createRoot } from "react-dom/client";
 import { useState, useEffect, useRef, type ReactNode } from "react";
 import { ClerkProvider, SignIn, useAuth, useClerk } from "@clerk/react";
+import { RepositoryLanding, Eyes } from "./RepositoryLanding";
+import "./workspace.css";
 import "./styles.css";
+import "./enhancements.css";
 let token: () => Promise<string | null> = async () => null;
 async function api(path: string, data?: any, method?: string) {
   const bearer = await token();
@@ -45,11 +48,16 @@ const statusLabel = (s: string) =>
     }) as any
   )[s] ?? s;
 const icons: Record<string, string> = {
-  overview: "◉",
-  chat: "◌",
-  board: "▤",
-  memory: "✦",
-  settings: "⚙",
+  overview: "🏠",
+  agents: "🤖",
+  deploy: "📲",
+  chat: "💬",
+  board: "✓",
+  memory: "🧠",
+  connections: "🔌",
+  reminders: "⏰",
+  activity: "🧾",
+  settings: "⚙️",
   family: "⌂",
   neighborhood: "▧",
   friends: "♡",
@@ -126,15 +134,24 @@ function Modal({
     </dialog>
   );
 }
-function App({ isDemo, logout }: { isDemo: boolean; logout?: () => void }) {
+function App({
+  isDemo,
+  logout,
+  localTest = false,
+}: {
+  isDemo: boolean;
+  logout?: () => void;
+  localTest?: boolean;
+}) {
   const [boot, setBoot] = useState<any>(null),
     [selected, setSelected] = useState(""),
     [page, setPage] = useState("overview"),
+    [homeTab, setHomeTab] = useState("input"),
     [data, setData] = useState<any>(null),
     [approvals, setApprovals] = useState<any[]>([]),
     [error, setError] = useState(""),
     [notice, setNotice] = useState(""),
-    [modal, setModal] = useState(""),
+    [modal, setModal] = useState(location.hash === "#/create" ? "agent" : ""),
     [busy, setBusy] = useState(false),
     [inviteLink, setInviteLink] = useState(""),
     [incomingInvite, setIncomingInvite] = useState<any>(null);
@@ -227,7 +244,7 @@ function App({ isDemo, logout }: { isDemo: boolean; logout?: () => void }) {
       (t: any) => t.status === "proposed" || t.status === "blocked",
     );
   return (
-    <div className="app-shell">
+    <div className="app app-shell">
       {inviteLink && (
         <Modal title="Invite one person" close={() => setInviteLink("")}>
           <p>
@@ -275,17 +292,22 @@ function App({ isDemo, logout }: { isDemo: boolean; logout?: () => void }) {
         </Modal>
       )}
       <aside className="sidebar">
-        <a href="#" className="brand" onClick={(e) => e.preventDefault()}>
-          <Mark />
-          gather<span className="brand-dot">.</span>
+        <a href="#/" className="brand logo">
+          agents
+          <Eyes size={27} />
         </a>
-        <div className="workspace-label">YOUR EVERYDAY, TOGETHER</div>
+        <div className="workspace-label">YOUR PERSONAL AGENTS</div>
         <nav className="nav">
           {[
-            ["overview", "Overview"],
-            ["chat", "Conversation"],
+            ["overview", "Home"],
+            ["agents", "Agents"],
+            ["deploy", "Deploy"],
+            ["chat", "Chats"],
             ["board", "Responsibilities"],
             ["memory", "Memory"],
+            ["connections", "Connections"],
+            ["reminders", "Reminders"],
+            ["activity", "Activity"],
           ].map(([id, label]) => (
             <button
               key={id}
@@ -349,7 +371,7 @@ function App({ isDemo, logout }: { isDemo: boolean; logout?: () => void }) {
             }
             onClick={() => setPage("settings")}
           >
-            {icons.settings} Settings & connections
+            {icons.settings} You & preferences
           </button>
           <div className="identity">
             <span className="avatar">
@@ -362,7 +384,11 @@ function App({ isDemo, logout }: { isDemo: boolean; logout?: () => void }) {
             <div>
               <b>{boot.person.name}</b>
               <small>
-                {isDemo ? "Demo workspace" : "Your personal workspace"}
+                {localTest
+                  ? "Local model test"
+                  : isDemo
+                    ? "Demo workspace"
+                    : "Your personal workspace"}
               </small>
             </div>
             {logout && (
@@ -406,7 +432,11 @@ function App({ isDemo, logout }: { isDemo: boolean; logout?: () => void }) {
             >
               ⚙
             </button>
-            {isDemo && <span className="demo-label">DEMO · SAMPLE DATA</span>}
+            {(isDemo || localTest) && (
+              <span className="demo-label">
+                {localTest ? "LOCAL TEST · GLM 5.3" : "DEMO · SAMPLE DATA"}
+              </span>
+            )}
             <button
               className="decision-count"
               onClick={() => setPage("overview")}
@@ -427,7 +457,23 @@ function App({ isDemo, logout }: { isDemo: boolean; logout?: () => void }) {
               ✓ {notice}
             </div>
           )}
-          {!active && page !== "settings" ? (
+          {page === "agents" ? (
+            <AgentCatalog
+              boot={boot}
+              create={() => setModal("agent")}
+              train={(id: string) => {
+                setSelected(id);
+                setPage("chat");
+              }}
+            />
+          ) : ["settings", "connections", "deploy"].includes(page) ? (
+            <Settings
+              boot={boot}
+              act={act}
+              view={page}
+              newAgent={() => setModal("agent")}
+            />
+          ) : !active ? (
             <Empty title="Meet your new helping hand">
               <p>
                 Create an agent, teach it what matters, then bring it into the
@@ -437,189 +483,228 @@ function App({ isDemo, logout }: { isDemo: boolean; logout?: () => void }) {
                 Create an agent
               </button>
             </Empty>
-          ) : page === "settings" ? (
-            <Settings
-              boot={boot}
-              act={act}
-              newAgent={() => setModal("agent")}
-            />
           ) : !data ? (
             <div className="loading">Opening this space…</div>
           ) : (
             <>
               {page === "overview" && (
                 <>
-                  <div className="hero">
+                  <div className="home-heading">
                     <div>
-                      <div className="eyebrow">
-                        <span className="tiny-dot" />{" "}
-                        {active.kind === "private"
-                          ? "YOUR PRIVATE SPACE"
-                          : "A HELPING HAND FOR YOUR PEOPLE"}
-                      </div>
                       <h1>
-                        A little help.
-                        <br />
-                        <em>A lot less on you.</em>
+                        Good{" "}
+                        {new Date().getHours() < 12
+                          ? "morning"
+                          : new Date().getHours() < 18
+                            ? "afternoon"
+                            : "evening"}
+                        , {boot.person.name.split(" ")[0]}.
                       </h1>
                       <p>
                         {active.kind === "private"
-                          ? "Teach Gather what matters. Your personal context stays here until you choose to share it."
-                          : "Keep the little things moving, so you can be there for the big ones."}
+                          ? "Train your agent here. Personal context stays private."
+                          : `One helping hand for ${active.name}. Keep decisions and follow-through in view.`}
                       </p>
-                      <div className="hero-actions">
-                        <button
-                          className="primary"
-                          onClick={() => setPage("chat")}
-                        >
-                          Ask {active.agent_name} <span>↗</span>
-                        </button>
-                        <button
-                          className="secondary"
-                          onClick={() => setModal("task")}
-                          disabled={active.kind === "private"}
-                        >
-                          Add a responsibility
-                        </button>
-                      </div>
                     </div>
-                    <div className="gather-art" aria-hidden>
-                      <div className="orbit one">
-                        <span>⌂</span>
-                      </div>
-                      <div className="orbit two">
-                        <span>♡</span>
-                      </div>
-                      <div className="orbit three">
-                        <span>✦</span>
-                      </div>
-                      <div className="art-center">
-                        <Mark />
-                      </div>
-                      <div className="art-note">we’ve got each other.</div>
+                    <div className="home-actions">
+                      <button
+                        className="primary"
+                        onClick={() => setPage("chat")}
+                      >
+                        Talk to {active.agent_name} ↗
+                      </button>
+                      <button
+                        className="secondary"
+                        onClick={() => setModal("task")}
+                        disabled={active.kind === "private"}
+                      >
+                        + Responsibility
+                      </button>
                     </div>
                   </div>
-                  <div className="stats">
-                    <div>
-                      <small>OPEN RESPONSIBILITIES</small>
-                      <strong>{open.length.toString().padStart(2, "0")}</strong>
-                      <span>Small things, kept in view</span>
-                    </div>
-                    <div>
-                      <small>NEED A LITTLE NUDGE</small>
-                      <strong>
-                        {needs.length.toString().padStart(2, "0")}
-                      </strong>
-                      <span>Waiting for a yes or some help</span>
-                    </div>
-                    <div>
-                      <small>YOUR PEOPLE</small>
-                      <strong>
-                        {data.members.length.toString().padStart(2, "0")}
-                      </strong>
-                      <span className="member-stack">
-                        {data.members.slice(0, 4).map((p: any, i: number) => (
-                          <i
-                            key={p.id}
-                            style={{
-                              background: [
-                                "#e4ecca",
-                                "#d9e5ed",
-                                "#f1decd",
-                                "#e0dbef",
-                              ][i],
-                            }}
-                            title={p.name}
-                          >
-                            {p.name
-                              .split(" ")
-                              .map((n: string) => n[0])
-                              .join("")
-                              .slice(0, 2)}
-                          </i>
-                        ))}
-                      </span>
-                    </div>
+                  <div
+                    className="home-tabs"
+                    role="tablist"
+                    aria-label="Home views"
+                  >
+                    {[
+                      ["input", "Need your input", approvals.length],
+                      ["radar", "On radar", open.length + data.jobs.length],
+                      ["activity", "Last activity", data.runs.length],
+                    ].map(([id, label, count]) => (
+                      <button
+                        key={id}
+                        role="tab"
+                        aria-selected={homeTab === id}
+                        aria-label={`${label} (${count})`}
+                        className={homeTab === id ? "on" : ""}
+                        onClick={() => setHomeTab(String(id))}
+                      >
+                        {label}
+                        <span>{count}</span>
+                      </button>
+                    ))}
                   </div>
-                  <div className="overview-grid">
-                    <div>
-                      <div className="section-head">
-                        <div>
-                          <div className="eyebrow">KEEPING LIFE MOVING</div>
-                          <h2>On our plate</h2>
-                        </div>
-                        <button
-                          className="text-button"
-                          onClick={() => setPage("board")}
-                        >
-                          See the board ↗
-                        </button>
-                      </div>
-                      <div className="task-list">
-                        {open.slice(0, 4).map((t: any) => (
-                          <TaskCard
-                            key={t.id}
-                            task={t}
-                            person={boot.person}
-                            act={act}
-                            options={() => setModal("options:" + t.id)}
-                            compact
-                          />
-                        ))}
-                        {!open.length && (
-                          <Empty title="Room to breathe">
-                            Nothing on the board yet. Add a responsibility when
-                            something needs follow-through.
-                          </Empty>
-                        )}
-                      </div>
-                      <div className="section-head second">
-                        <h2>Ahead of us</h2>
-                      </div>
-                      <Followups jobs={data.jobs} act={act} />
-                    </div>
-                    <aside className="right-rail">
+                  {homeTab === "input" && (
+                    <div className="home-input">
                       <ApprovalPanel
                         approvals={approvals}
                         act={act}
                         busy={busy}
                       />
-                      <div className="soft-card">
-                        <div className="eyebrow">A SMALL IDEA</div>
-                        <h3>Something on your mind?</h3>
-                        <p>
-                          Start with what needs doing. Gather can help figure
-                          out where to look, who to ask, and what comes next.
-                        </p>
+                      <div className="next-actions">
+                        <h2>A good place to start</h2>
                         <button
-                          className="suggestion"
-                          onClick={() => {
-                            setPage("chat");
-                            setNotice(
-                              "Try asking for a Mandarin-speaking handyman.",
-                            );
-                          }}
+                          className="secondary"
+                          onClick={() => setPage("board")}
                         >
-                          Find a Mandarin-speaking handyman <span>↗</span>
+                          Review responsibilities ↗
                         </button>
                         <button
-                          className="suggestion"
+                          className="secondary"
                           onClick={() => setPage("chat")}
                         >
-                          Help Mum join a video call <span>↗</span>
+                          Find help for the family ↗
                         </button>
+                        <p>
+                          Questions and suggestions are welcome. Outbound
+                          actions wait for the right person’s permission.
+                        </p>
                       </div>
-                      <div className="privacy-note">
-                        ◇{" "}
-                        <span>
-                          {active.kind === "private"
-                            ? "Only you can see this conversation."
-                            : "This space has its own memory. Private conversations stay out of it."}
-                        </span>
+                    </div>
+                  )}
+                  {homeTab === "radar" && (
+                    <>
+                      <div className="stats">
+                        <div>
+                          <small>OPEN RESPONSIBILITIES</small>
+                          <strong>
+                            {open.length.toString().padStart(2, "0")}
+                          </strong>
+                          <span>Small things, kept in view</span>
+                        </div>
+                        <div>
+                          <small>NEED A LITTLE NUDGE</small>
+                          <strong>
+                            {needs.length.toString().padStart(2, "0")}
+                          </strong>
+                          <span>Waiting for a yes or some help</span>
+                        </div>
+                        <div>
+                          <small>YOUR PEOPLE</small>
+                          <strong>
+                            {data.members.length.toString().padStart(2, "0")}
+                          </strong>
+                          <span className="member-stack">
+                            {data.members
+                              .slice(0, 4)
+                              .map((p: any, i: number) => (
+                                <i
+                                  key={p.id}
+                                  style={{
+                                    background: [
+                                      "#e4ecca",
+                                      "#d9e5ed",
+                                      "#f1decd",
+                                      "#e0dbef",
+                                    ][i],
+                                  }}
+                                  title={p.name}
+                                >
+                                  {p.name
+                                    .split(" ")
+                                    .map((n: string) => n[0])
+                                    .join("")
+                                    .slice(0, 2)}
+                                </i>
+                              ))}
+                          </span>
+                        </div>
                       </div>
-                    </aside>
-                  </div>
-                  <Runs runs={data.runs} act={act} />
+                      <div className="overview-grid">
+                        <div>
+                          <div className="section-head">
+                            <div>
+                              <div className="eyebrow">KEEPING LIFE MOVING</div>
+                              <h2>On our plate</h2>
+                            </div>
+                            <button
+                              className="text-button"
+                              onClick={() => setPage("board")}
+                            >
+                              See the board ↗
+                            </button>
+                          </div>
+                          <div className="task-list">
+                            {open.slice(0, 4).map((t: any) => (
+                              <TaskCard
+                                key={t.id}
+                                task={t}
+                                person={boot.person}
+                                act={act}
+                                options={() => setModal("options:" + t.id)}
+                                compact
+                              />
+                            ))}
+                            {!open.length && (
+                              <Empty title="Room to breathe">
+                                Nothing on the board yet. Add a responsibility
+                                when something needs follow-through.
+                              </Empty>
+                            )}
+                          </div>
+                          <div className="section-head second">
+                            <h2>Ahead of us</h2>
+                          </div>
+                          <Followups jobs={data.jobs} act={act} />
+                        </div>
+                        <aside className="right-rail">
+                          <ApprovalPanel
+                            approvals={approvals}
+                            act={act}
+                            busy={busy}
+                          />
+                          <div className="soft-card">
+                            <div className="eyebrow">A SMALL IDEA</div>
+                            <h3>Something on your mind?</h3>
+                            <p>
+                              Start with what needs doing. Gather can help
+                              figure out where to look, who to ask, and what
+                              comes next.
+                            </p>
+                            <button
+                              className="suggestion"
+                              onClick={() => {
+                                setPage("chat");
+                                setNotice(
+                                  "Try asking for a Mandarin-speaking handyman.",
+                                );
+                              }}
+                            >
+                              Find a Mandarin-speaking handyman <span>↗</span>
+                            </button>
+                            <button
+                              className="suggestion"
+                              onClick={() => setPage("chat")}
+                            >
+                              Help Mum join a video call <span>↗</span>
+                            </button>
+                          </div>
+                          <div className="privacy-note">
+                            ◇{" "}
+                            <span>
+                              {active.kind === "private"
+                                ? "Only you can see this conversation."
+                                : "This space has its own memory. Private conversations stay out of it."}
+                            </span>
+                          </div>
+                        </aside>
+                      </div>
+                    </>
+                  )}
+                  {homeTab === "activity" && (
+                    <Runs runs={data.runs} act={act} />
+                  )}
                 </>
               )}
               {page === "chat" && (
@@ -686,6 +771,8 @@ function App({ isDemo, logout }: { isDemo: boolean; logout?: () => void }) {
                   </div>
                 </>
               )}
+              {page === "reminders" && <Reminders data={data} act={act} />}
+              {page === "activity" && <Runs runs={data.runs} act={act} />}
               {page === "memory" && (
                 <Memory space={data.space} spaces={boot.spaces} act={act} />
               )}
@@ -694,9 +781,11 @@ function App({ isDemo, logout }: { isDemo: boolean; logout?: () => void }) {
         </main>
         <footer>
           made for the people in your life <span>✳</span>{" "}
-          {isDemo
-            ? "Local preview. No real calls, posts, messages or bookings."
-            : "Private by default. Permission before action."}
+          {localTest
+            ? "Local model test · fictional data · outbound actions disabled."
+            : isDemo
+              ? "Local preview. No real calls, posts, messages or bookings."
+              : "Private by default. Permission before action."}
         </footer>
       </div>
       {modal === "agent" && (
@@ -1610,7 +1699,7 @@ function Memory({ space, spaces, act }: any) {
     </>
   );
 }
-function Settings({ boot, act, newAgent }: any) {
+function Settings({ boot, act, newAgent, view = "settings" }: any) {
   const [connections, setConnections] = useState<any[]>([]),
     [device, setDevice] = useState({ name: "My device", url: "", token: "" }),
     [phone, setPhone] = useState(""),
@@ -1624,14 +1713,20 @@ function Settings({ boot, act, newAgent }: any) {
     <>
       <div className="page-head">
         <div className="eyebrow">YOUR AGENT, YOUR PERMISSION</div>
-        <h1>A few things behind the scenes.</h1>
+        <h1>
+          {view === "deploy"
+            ? "Deploy"
+            : view === "connections"
+              ? "Connections"
+              : "You & preferences"}
+        </h1>
         <p>
           Accounts stay personal. Every outbound action is reviewed before it
           happens.
         </p>
       </div>
-      <div className="settings-grid">
-        <section className="panel">
+      <div className={`settings-grid settings-${view}`}>
+        <section className="panel settings-agents-panel">
           <div className="section-head">
             <h2>Your helping hands</h2>
             <button className="text-button" onClick={newAgent}>
@@ -1653,7 +1748,7 @@ function Settings({ boot, act, newAgent }: any) {
             </div>
           ))}
         </section>
-        <section className="panel">
+        <section className="panel settings-phone-panel">
           <h2>iMessage</h2>
           <p>
             One trained account brings Gather in. Family and friends can ask it
@@ -1664,7 +1759,7 @@ function Settings({ boot, act, newAgent }: any) {
               ? "Line connected"
               : "Requires a Photon line"}
           </Pill>
-          {!boot.demo && (
+          {!boot.demo && !boot.localTest && (
             <form
               className="form mt"
               onSubmit={(e) => {
@@ -1702,7 +1797,7 @@ function Settings({ boot, act, newAgent }: any) {
             pool supports DMs only.
           </small>
         </section>
-        <section className="panel">
+        <section className="panel settings-accounts-panel">
           <h2>Connected accounts</h2>
           <p>
             Google credentials are encrypted on the server. Sending as you is
@@ -1746,7 +1841,7 @@ function Settings({ boot, act, newAgent }: any) {
           ))}
           <button
             className="secondary"
-            disabled={boot.demo || !boot.integrations.google}
+            disabled={boot.demo || boot.localTest || !boot.integrations.google}
             onClick={() =>
               act(async () => {
                 const r = await api("/connections/google", {});
@@ -1760,7 +1855,7 @@ function Settings({ boot, act, newAgent }: any) {
             <small>Google OAuth needs server configuration.</small>
           )}
         </section>
-        <section className="panel">
+        <section className="panel settings-channels-panel">
           <h2>Hands & channels</h2>
           <p>
             When search isn’t enough, Gather can ask permission to browse, call,
@@ -1768,7 +1863,7 @@ function Settings({ boot, act, newAgent }: any) {
           </p>
           <div className="integration-status">
             {[
-              ["model", "Reasoning"],
+              ["model", "GLM 5.3 · OpenRouter"],
               ["search", "Web search"],
               ["browser", "Cloud browser"],
               ["calls", "Business calls"],
@@ -1787,7 +1882,7 @@ function Settings({ boot, act, newAgent }: any) {
               : "Configured does not mean live-verified. Test each provider before a real family pilot."}
           </small>
         </section>
-        <section className="panel">
+        <section className="panel settings-device-panel">
           <h2>A connected device</h2>
           <p>
             Bring your own MCP server, such as an iPhone bridge. Its actions are
@@ -1831,7 +1926,10 @@ function Settings({ boot, act, newAgent }: any) {
                 }
               />
             </label>
-            <button className="secondary" disabled={boot.demo}>
+            <button
+              className="secondary"
+              disabled={boot.demo || boot.localTest}
+            >
               Connect device
             </button>
           </form>
@@ -1946,6 +2044,139 @@ function SpaceForm({ agents, submit }: any) {
         Create the space
       </button>
     </form>
+  );
+}
+function AgentCatalog({ boot, create, train }: any) {
+  return (
+    <>
+      <div className="page-head">
+        <h1>Your agents</h1>
+        <p>
+          Teach each one first, then bring it to the people and chats it can
+          help.
+        </p>
+        <button className="primary" onClick={create}>
+          + Create an agent
+        </button>
+      </div>
+      <div className="agent-catalog">
+        {boot.agents.map((a: any) => {
+          const space = boot.spaces.find(
+              (s: any) => s.agent_id === a.id && s.kind === "private",
+            ),
+            ready = Number(a.memory_count) >= 3;
+          return (
+            <article className="card" key={a.id}>
+              <div className="agent-card-head">
+                <span className="agent-avatar">🤖</span>
+                <div>
+                  <h3>{a.name}</h3>
+                  <Pill>
+                    {ready
+                      ? "Ready for a group"
+                      : `In training · ${a.memory_count}/3`}
+                  </Pill>
+                </div>
+              </div>
+              <p>{a.purpose}</p>
+              <div
+                className="training-meter"
+                aria-label={`${a.memory_count} memories learned`}
+              >
+                <span
+                  style={{
+                    width: `${Math.min(100, (Number(a.memory_count) / 3) * 100)}%`,
+                  }}
+                />
+              </div>
+              <div className="agent-card-foot">
+                <small>
+                  {ready
+                    ? "Private training stays separate from each group."
+                    : "Teach three memories before group setup."}
+                </small>
+                <button
+                  className="secondary"
+                  disabled={!space}
+                  onClick={() => train(space.id)}
+                >
+                  Train ↗
+                </button>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+      {!boot.agents.length && (
+        <Empty title="Your first agent">
+          <p>Start with a name and one job you want help with.</p>
+          <button className="primary" onClick={create}>
+            Create an agent
+          </button>
+        </Empty>
+      )}
+    </>
+  );
+}
+function Reminders({ data, act }: any) {
+  const [prompt, setPrompt] = useState(""),
+    [at, setAt] = useState(""),
+    [repeat, setRepeat] = useState(false);
+  return (
+    <>
+      <div className="page-head">
+        <h1>Reminders</h1>
+        <p>
+          Checks that follow through. Quiet when nothing changes; a nudge when
+          it matters.
+        </p>
+      </div>
+      <Followups jobs={data.jobs} act={act} />
+      <form
+        className="panel reminder-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          act(async () => {
+            await api(`/spaces/${data.space.id}/followups`, {
+              prompt,
+              at: new Date(at).getTime(),
+              intervalMs: repeat ? 86400000 : null,
+            });
+            setPrompt("");
+            setAt("");
+          }, "Follow-up scheduled.");
+        }}
+      >
+        <h2>Keep something on radar</h2>
+        <label>
+          What should the agent check?
+          <textarea
+            required
+            maxLength={2000}
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+          />
+        </label>
+        <label>
+          When
+          <input
+            type="datetime-local"
+            required
+            value={at}
+            onChange={(e) => setAt(e.target.value)}
+          />
+        </label>
+        <label className="checkbox">
+          <input
+            type="checkbox"
+            checked={repeat}
+            onChange={(e) => setRepeat(e.target.checked)}
+          />
+          Repeat daily until cancelled
+        </label>
+        <button className="primary">Schedule check-in</button>
+      </form>
+    </>
   );
 }
 function TaskForm({ members, submit }: any) {
@@ -2111,30 +2342,36 @@ function Options({ task, act }: any) {
     </>
   );
 }
-function LiveApp() {
+function useLocationHash() {
+  const [hash, setHash] = useState(location.hash);
+  useEffect(() => {
+    const update = () => setHash(location.hash);
+    addEventListener("hashchange", update);
+    return () => removeEventListener("hashchange", update);
+  }, []);
+  return hash;
+}
+function LiveApp({ clerkKey }: { clerkKey: string }) {
   const { isLoaded, isSignedIn, getToken } = useAuth(),
     clerk = useClerk();
+  const hash = useLocationHash();
   token = () => getToken();
-  if (!isLoaded) return <div className="loading">Opening Gather…</div>;
-  return isSignedIn ? (
+  if (!isLoaded) return <div className="loading">Opening your workspace…</div>;
+  return isSignedIn &&
+    (hash.startsWith("#/app") ||
+      hash === "#/create" ||
+      hash.startsWith("#invite=")) ? (
     <App isDemo={false} logout={() => clerk.signOut()} />
   ) : (
-    <div className="signin">
-      <div className="brand">
-        <Mark />
-        gather.
-      </div>
-      <h1>
-        Life is better
-        <br />
-        <em>with a little help.</em>
-      </h1>
-      <p>
-        A thoughtful agent for the chats, responsibilities and people you
-        already have.
-      </p>
-      <SignIn routing="hash" />
-    </div>
+    <RepositoryLanding signedIn={!!isSignedIn} clerk={clerkKey} />
+  );
+}
+function DemoApp({ localTest = false }: { localTest?: boolean }) {
+  const hash = useLocationHash();
+  return hash.startsWith("#/app") || hash === "#/create" ? (
+    <App isDemo={!localTest} localTest={localTest} />
+  ) : (
+    <RepositoryLanding signedIn={false} clerk={null} demo />
   );
 }
 fetch("/config")
@@ -2142,28 +2379,14 @@ fetch("/config")
   .then((config) => {
     const root = createRoot(document.getElementById("root")!);
     root.render(
-      config.demo ? (
-        <App isDemo />
+      config.demo || config.localTest ? (
+        <DemoApp localTest={config.localTest} />
       ) : config.clerkKey ? (
         <ClerkProvider publishableKey={config.clerkKey}>
-          <LiveApp />
+          <LiveApp clerkKey={config.clerkKey} />
         </ClerkProvider>
       ) : (
-        <div className="signin">
-          <div className="brand">
-            <Mark />
-            gather.
-          </div>
-          <h1>
-            Your people.
-            <br />
-            <em>One less thing.</em>
-          </h1>
-          <p>
-            Configure Clerk sign-in and a model provider to start a live
-            workspace, or run the local demo to explore the product.
-          </p>
-        </div>
+        <RepositoryLanding signedIn={false} clerk={null} />
       ),
     );
   });

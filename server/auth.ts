@@ -1,7 +1,10 @@
 import { verifyToken, createClerkClient } from "@clerk/backend";
-import { db, demo, first, uid, time, demand } from "./store";
+import { db, demo, localTest, first, uid, time, demand } from "./store";
+import { requireLocalRequest } from "./local-test";
 export async function authenticate(req: Request) {
-  if (demo) return first(db`select * from gather_people where id='demo_alex'`);
+  if (localTest) requireLocalRequest(req);
+  if (demo || localTest)
+    return first(db`select * from gather_people where id='demo_alex'`);
   const bearer = req.headers.get("authorization")?.match(/^Bearer (.+)$/i)?.[1];
   demand(bearer && process.env.CLERK_SECRET_KEY, 401, "Sign in to continue.");
   const claims = await verifyToken(bearer, {

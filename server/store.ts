@@ -5,6 +5,9 @@ import {
   createCipheriv,
   createDecipheriv,
 } from "node:crypto";
+import { validateLocalTest } from "./local-test";
+validateLocalTest(process.env);
+export const localTest = process.env.LOCAL_TEST_MODE === "1";
 export const demo = process.env.DEMO_MODE === "1";
 if (demo && process.env.NODE_ENV === "production")
   throw new Error("Demo mode is local-only.");

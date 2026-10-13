@@ -9,6 +9,7 @@ import {
   uid,
   json,
   demo,
+  localTest,
 } from "./store";
 import { complete, type ChatMessage } from "./model";
 export type ProviderResult = {
@@ -89,7 +90,11 @@ export async function invoke(
   ctx: any,
 ): Promise<ProviderResult> {
   if (providerHooks.invoke) return providerHooks.invoke(tool, input, ctx);
-  demand(!demo, 409, "Live providers are disabled in the demo.");
+  demand(
+    !demo && !localTest,
+    409,
+    "Outbound providers are disabled in this local preview.",
+  );
   switch (tool) {
     case "search_web": {
       demand(

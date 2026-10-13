@@ -51,7 +51,7 @@ export async function complete(
       ? (process.env.MEDIA_MODEL ?? "google/gemini-2.5-flash")
       : tier === "smart"
         ? (process.env.MODEL_SMART ?? "z-ai/glm-5.3")
-        : (process.env.MODEL_CHEAP ?? "z-ai/glm-5.3-flash");
+        : (process.env.MODEL_CHEAP ?? "z-ai/glm-5.3");
   const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {

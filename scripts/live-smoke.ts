@@ -83,7 +83,7 @@ await Bun.write(
   JSON.stringify(
     {
       at: new Date().toISOString(),
-      modelCheap: process.env.MODEL_CHEAP ?? "z-ai/glm-5.3-flash",
+      modelCheap: process.env.MODEL_CHEAP ?? "z-ai/glm-5.3",
       modelSmart: process.env.MODEL_SMART ?? "z-ai/glm-5.3",
       syntheticOnly: true,
       results,

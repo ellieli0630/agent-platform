@@ -1,0 +1,1244 @@
+/* Extend agent-platform's original lime, ink, sticker and offset-shadow UI. */
+:root {
+  --paper: #fff;
+  --ink: #111;
+  --muted: #55554f;
+  --line: #e2e2dc;
+  --green: #eefbc4;
+  --accent: #111;
+  --nav: #fff;
+  --gold: #ffe14d;
+  --serif: Rubik, Inter, sans-serif;
+  --sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+html,
+body,
+#root {
+  min-height: 100%;
+  height: auto;
+}
+body {
+  background: #fbfbf8;
+  color: #111;
+}
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  height: auto;
+}
+.app .sidebar {
+  width: 236px;
+  background: #fff;
+  border-right: 2px solid #111;
+  padding: 20px 14px;
+  gap: 0;
+}
+.app .brand.logo {
+  font:
+    600 34px/1 Caveat,
+    cursive;
+  gap: 3px;
+  letter-spacing: 0;
+  margin-bottom: 14px;
+  padding: 0 10px;
+}
+.app .workspace-label {
+  font-size: 10px;
+  letter-spacing: 0.09em;
+  color: #67646f;
+  margin: 10px 10px 12px;
+}
+.app .nav {
+  gap: 4px;
+  margin: 0;
+}
+.app .nav button {
+  min-height: 39px;
+  padding: 8px 10px;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.35;
+  color: #111;
+  gap: 10px;
+}
+.app .nav button > span {
+  width: 20px;
+  font-size: 16px;
+  color: inherit;
+}
+.app .nav button:hover {
+  background: #f3f3ee;
+}
+.app .nav button.active {
+  background: #c6f432;
+  border-color: #111;
+  box-shadow: 2px 2px 0 #111;
+  font-weight: 650;
+}
+.app .nav button b {
+  background: #ffe14d;
+  color: #111;
+  border: 1px solid #111;
+}
+.app .side-heading {
+  margin: 25px 8px 10px;
+  font-size: 10px;
+  letter-spacing: 0.09em;
+  color: #55554f;
+}
+.app .space-list button {
+  padding: 8px 10px;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  font-size: 12px;
+  gap: 10px;
+}
+.app .space-list button.selected {
+  background: #eefbc4;
+  border-color: #111;
+  box-shadow: 2px 2px 0 #111;
+}
+.app .space-icon {
+  width: 30px;
+  height: 30px;
+  border: 1.5px solid #111;
+  border-radius: 9px;
+  background: #fff;
+  color: #111;
+  font-size: 17px;
+}
+.app .space-icon.family {
+  background: #ffe14d;
+}
+.app .space-icon.private {
+  background: #c6f432;
+}
+.app .space-icon.neighborhood {
+  background: #9be7c4;
+}
+.app .space-icon.friends {
+  background: #e4dcff;
+}
+.app .space-list small {
+  font-size: 10px;
+  color: #67646f;
+}
+.app .side-bottom {
+  padding-top: 24px;
+  margin-top: auto;
+}
+.app .small-callout {
+  border: 1.5px solid #111;
+  border-radius: 12px;
+  background: #eefbc4;
+  padding: 12px;
+}
+.app .small-callout span {
+  color: #111;
+}
+.app .small-callout p,
+.app .small-callout small {
+  color: #444;
+}
+.app .side-settings {
+  font-size: 12px;
+  color: #111;
+  padding: 12px 8px;
+}
+.app .person-line {
+  margin-top: 8px;
+  border-top: 1px solid #e2e2dc;
+  padding-top: 14px;
+}
+.app .person-line b {
+  font-size: 12px;
+}
+.app .person-avatar {
+  background: #ffe14d;
+  border: 1.5px solid #111;
+  color: #111;
+}
+.app .workspace {
+  margin-left: 236px;
+  width: calc(100% - 236px);
+  min-width: 0;
+}
+.app .topbar {
+  padding: 16px 32px;
+  background: #fff;
+  border-bottom: 2px solid #111;
+  min-height: 64px;
+  gap: 12px;
+}
+.app .topbar b {
+  font-size: 12px;
+  color: #111;
+}
+.app .top-meta {
+  gap: 12px;
+}
+.app .decision-count {
+  border: 1.5px solid #111;
+  border-radius: 9px;
+  padding: 5px 9px;
+  background: #fff;
+  font-size: 11px;
+}
+.app .decision-count span {
+  background: #c6f432;
+  color: #111;
+  border-radius: 5px;
+  padding: 0 5px;
+}
+.app .demo-label {
+  background: #ffe14d;
+  color: #111;
+  border: 1px solid #111;
+  font-size: 9px;
+}
+.app .crumb,
+.app .crumb-sep {
+  font-size: 11px;
+  color: #67646f;
+}
+.app main {
+  padding: 36px 32px 60px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.app h1 {
+  font:
+    800 clamp(26px, 2.2vw, 34px)/1.18 Rubik,
+    Inter,
+    sans-serif;
+  letter-spacing: -0.035em;
+  color: #111;
+}
+.app h2 {
+  font:
+    700 14px/1.3 Rubik,
+    Inter,
+    sans-serif;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #111;
+  margin: 0;
+}
+.app h3 {
+  font:
+    700 16px/1.35 Rubik,
+    Inter,
+    sans-serif;
+  color: #111;
+}
+.app p {
+  font-size: 14px;
+  line-height: 1.65;
+  color: #55554f;
+}
+.app small {
+  font-size: 11px;
+  color: #67646f;
+}
+.app .eyebrow {
+  color: #67646f;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+.app .page-head {
+  margin-bottom: 26px;
+}
+.app .page-head p {
+  max-width: 650px;
+  margin-top: 8px;
+}
+.app .page-head > .primary {
+  position: static;
+  margin-top: 16px;
+}
+.app .primary,
+.app .secondary,
+dialog .primary,
+dialog .secondary {
+  border: 2px solid #111;
+  border-radius: 11px;
+  padding: 9px 14px;
+  min-height: 40px;
+  font-size: 13px;
+  font-weight: 650;
+  box-shadow: 0 3px 0 #111;
+}
+.app .primary,
+dialog .primary {
+  background: #111;
+  color: #fff;
+  box-shadow:
+    inset 0 0 0 2px #fff,
+    0 3px 0 #111;
+}
+.app .secondary,
+dialog .secondary {
+  background: #fff;
+  color: #111;
+}
+.app .primary:hover,
+dialog .primary:hover {
+  background: #111;
+  transform: translateY(-1px);
+}
+.app .secondary:hover,
+dialog .secondary:hover {
+  background: #eefbc4;
+  transform: translateY(-1px);
+}
+.app .primary:disabled,
+.app .secondary:disabled {
+  box-shadow: none;
+  transform: none;
+}
+.app .text-button {
+  font-size: 12px;
+  color: #111;
+  font-weight: 600;
+}
+.app .text-button:hover {
+  text-decoration: underline;
+  text-decoration-color: #111;
+  text-underline-offset: 3px;
+}
+.app input,
+.app textarea,
+.app select,
+dialog input,
+dialog textarea,
+dialog select {
+  border: 2px solid #111;
+  background: #fff;
+  color: #111;
+  border-radius: 11px;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+.app input:focus,
+.app textarea:focus,
+.app select:focus,
+dialog input:focus,
+dialog textarea:focus {
+  box-shadow: 0 0 0 3px #c6f432;
+}
+.app .checkbox input {
+  width: 16px;
+  accent-color: #111;
+}
+.app .mark {
+  color: #111;
+}
+.home-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 26px;
+}
+.home-heading p {
+  margin-top: 8px;
+  max-width: 570px;
+}
+.home-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+.home-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+.home-tabs button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 2px solid #111;
+  background: #fff;
+  border-radius: 10px;
+  padding: 9px 13px;
+  font-weight: 600;
+  font-size: 13px;
+  box-shadow: 0 2px 0 #111;
+}
+.home-tabs button.on {
+  background: #c6f432;
+}
+.home-tabs button span {
+  font-size: 11px;
+  background: #fff;
+  border: 1px solid #111;
+  padding: 0 5px;
+  border-radius: 5px;
+}
+.home-input {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 22px;
+  align-items: start;
+}
+.home-input .approval-panel {
+  background: #fff;
+}
+.next-actions {
+  background: #fff;
+  border: 2px solid #111;
+  box-shadow: 3px 3px 0 #111;
+  padding: 20px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+.next-actions p {
+  font-size: 12px;
+}
+.app .stats {
+  border: 2px solid #111;
+  box-shadow: 3px 3px 0 #111;
+  border-radius: 16px;
+  background: #fff;
+  margin: 0 0 32px;
+}
+.app .stats strong {
+  font:
+    800 32px/1.2 Rubik,
+    Inter,
+    sans-serif;
+  color: #111;
+}
+.app .stats small {
+  color: #555;
+  font-size: 9px;
+}
+.app .stats > div {
+  padding: 20px;
+}
+.app .stats > div + div {
+  border-color: #e2e2dc;
+}
+.app .overview-grid {
+  grid-template-columns: 1.45fr 1fr;
+  gap: 24px;
+}
+.app .task-card,
+.app .panel,
+.app .run-card,
+.app .memory-card,
+.app .comparison-row {
+  border: 2px solid #111;
+  box-shadow: 3px 3px 0 #111;
+  background: #fff;
+  border-radius: 15px;
+}
+.app .task-card {
+  padding: 17px;
+  margin-bottom: 15px;
+}
+.app .task-card h3 {
+  font-size: 15px;
+}
+.app .task-icon {
+  background: #ffe14d;
+  border: 1.5px solid #111;
+  color: #111;
+  border-radius: 10px;
+}
+.app .task-card p,
+.app .task-card small {
+  font-size: 12px;
+  color: #555;
+}
+.app .task-card .task-actions {
+  gap: 8px;
+}
+.app .task-card .task-actions .text-button {
+  font-size: 11px;
+}
+.app .pill {
+  border: 1.5px solid #111;
+  border-radius: 999px;
+  background: #fff;
+  color: #111;
+  font-size: 10px;
+  padding: 3px 8px;
+  line-height: 1.4;
+}
+.app .pill.proposed,
+.app .pill.waiting_approval,
+.app .pill.waiting_share,
+.app .pill.waiting_time {
+  background: #ffe14d;
+  color: #111;
+}
+.app .pill.done,
+.app .pill.complete,
+.app .pill.accepted {
+  background: #c6f432;
+  color: #111;
+}
+.app .pill.blocked,
+.app .pill.needs_check,
+.app .pill.failed {
+  background: #ffd4c3;
+  color: #111;
+}
+.app .pill.running,
+.app .pill.queued {
+  background: #dceaff;
+  color: #111;
+}
+.app .approval-panel {
+  border: 2px solid #111;
+  border-radius: 16px;
+  background: #eefbc4;
+  padding: 22px;
+  box-shadow: 3px 3px 0 #111;
+}
+.app .approval-panel h3 {
+  font:
+    700 18px/1.25 Rubik,
+    Inter,
+    sans-serif;
+}
+.app .approval-card {
+  border-color: #111;
+  background: #fff;
+}
+.app .soft-card {
+  background: #fff;
+  border: 2px solid #111;
+  box-shadow: 3px 3px 0 #111;
+}
+.app .suggestion {
+  color: #111;
+  border-color: #e2e2dc;
+}
+.app .privacy-note {
+  font-size: 12px;
+  color: #555;
+}
+.app .section-head {
+  margin-bottom: 15px;
+  align-items: center;
+}
+.app .section-head.second {
+  margin-top: 30px;
+}
+.app .followups > div {
+  border: 1.5px solid #111;
+  border-radius: 12px;
+  background: #fff;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.app .followup-icon {
+  color: #111;
+  background: #c6f432;
+  border: 1px solid #111;
+}
+.app .runs {
+  margin-top: 0;
+}
+.app .plan-step > span {
+  background: #ffe14d;
+  border: 1.5px solid #111;
+  color: #111;
+}
+.app .plan-step.complete > span {
+  background: #c6f432;
+  color: #111;
+}
+.app .plan-step small {
+  font-size: 11px;
+}
+.app .plan-step b {
+  font-size: 14px;
+}
+.app .plan-step p {
+  font-size: 12px;
+}
+.app .plan-step details {
+  font-size: 12px;
+  color: #555;
+}
+.app .board {
+  gap: 18px;
+}
+.app .board-column-head h3 {
+  font-size: 13px;
+}
+.app .board-column-head > span {
+  border: 1px solid #111;
+  background: #fff;
+}
+.app .board-empty {
+  background: #f3f3ee;
+  border: 1px dashed #a4a49b;
+  border-radius: 12px;
+  color: #67646f;
+}
+.app .memory-boundary {
+  background: #eefbc4;
+  border: 2px solid #111;
+  border-radius: 14px;
+}
+.app .memory-boundary span {
+  color: #111;
+}
+.app .memory-form {
+  background: #fff;
+  border: 2px solid #111;
+  box-shadow: 3px 3px 0 #111;
+}
+.app .memory-card > p {
+  font-size: 15px;
+  color: #111;
+}
+.app .message-avatar {
+  background: #c6f432;
+  border: 1.5px solid #111;
+  color: #111;
+}
+.app .message.person .message-avatar {
+  background: #ffe14d;
+}
+.app .message p {
+  border: 2px solid #111;
+  background: #fff;
+  box-shadow: 2px 2px 0 #111;
+  border-radius: 14px;
+  padding: 13px 16px;
+  color: #111;
+  font-size: 14px;
+}
+.app .message.mine p {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+  box-shadow: none;
+}
+.app .message.mine .message-avatar {
+  background: #fff;
+  color: #111;
+}
+.app .composer {
+  border: 2px solid #111;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 3px 3px 0 #111;
+}
+.app .composer input {
+  border: 0;
+  box-shadow: none;
+}
+.app .composer > button {
+  background: #111;
+  color: #fff;
+  border-radius: 10px;
+}
+.app .working {
+  background: #eefbc4;
+  border: 1px solid #111;
+  color: #111;
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+.app .settings-grid {
+  gap: 22px;
+}
+.app .settings-deploy .panel:not(.settings-phone-panel),
+.app .settings-connections .settings-agents-panel,
+.app .settings-connections .settings-phone-panel,
+.app .settings-settings .settings-phone-panel,
+.app .settings-settings .settings-accounts-panel,
+.app .settings-settings .settings-device-panel {
+  display: none;
+}
+.app .settings-deploy {
+  grid-template-columns: minmax(0, 650px);
+}
+.app .integration-status > div {
+  border-color: #e2e2dc;
+}
+.app .agent-row {
+  border-color: #e2e2dc;
+}
+.app footer {
+  color: #67646f;
+  font-size: 11px;
+  border-top: 1px solid #e2e2dc;
+}
+.app footer span {
+  color: #111;
+}
+.app .empty {
+  background: #fff;
+  color: #67646f;
+  border: 2px dashed #a4a49b;
+}
+.app .empty h3 {
+  font-size: 16px;
+}
+.app .error {
+  color: #8b2511;
+  background: #fff3ed;
+  border: 1px solid #d04b2e;
+  border-radius: 10px;
+}
+.app .toast {
+  background: #111;
+  color: #fff;
+  border: 1px solid #111;
+}
+.app .reminder-form {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+  max-width: 650px;
+}
+.agent-catalog {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+.agent-catalog .card {
+  padding: 24px;
+  margin: 0;
+}
+.agent-card-head {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.agent-avatar {
+  display: grid;
+  place-items: center;
+  width: 55px;
+  height: 55px;
+  background: #c6f432;
+  border: 2px solid #111;
+  border-radius: 13px;
+  box-shadow: 3px 3px 0 #111;
+  font-size: 28px;
+}
+.agent-card-head h3 {
+  margin-bottom: 7px;
+}
+.agent-catalog .card > p {
+  min-height: 65px;
+}
+.training-meter {
+  height: 9px;
+  border: 1.5px solid #111;
+  background: #f3f3ee;
+  border-radius: 8px;
+  margin: 20px 0;
+  overflow: hidden;
+}
+.training-meter span {
+  display: block;
+  height: 100%;
+  background: #c6f432;
+}
+.agent-card-foot {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: space-between;
+}
+dialog.modal {
+  color: #111;
+  background: #fff;
+  border: 2px solid #111;
+  box-shadow: 7px 7px 0 #111;
+  border-radius: 18px;
+  max-width: min(620px, calc(100vw - 32px));
+  padding: 26px;
+  position: fixed;
+}
+dialog .modal-head h2 {
+  font:
+    800 24px/1.2 Rubik,
+    Inter,
+    sans-serif;
+  text-transform: none;
+  letter-spacing: -0.03em;
+  color: #111;
+  margin: 0;
+}
+dialog .share-preview,
+dialog .approval-text {
+  border: 1px solid #111;
+  background: #eefbc4;
+}
+:focus-visible {
+  outline-color: #111;
+  outline-offset: 3px;
+}
+::selection {
+  background: #c6f432;
+  color: #111;
+}
+.gm {
+  min-height: 100vh;
+  height: auto;
+  overflow-y: visible;
+}
+.gm-nav .row {
+  justify-content: flex-end;
+}
+.gm-hero {
+  padding-top: 48px;
+}
+.gm .ed-title {
+  max-width: 1400px;
+}
+.gm .gm-card h2 {
+  display: block;
+  text-transform: none;
+  letter-spacing: 0;
+  margin: 0;
+}
+.gm .gm-sub {
+  max-width: 640px;
+}
+.gm .gm-step p {
+  font-size: 15px;
+}
+.gm .gm-steps {
+  gap: 22px;
+}
+.gm .example-caption {
+  font-size: 11px;
+  color: #67646f;
+  text-align: center;
+  max-width: 320px;
+  margin: 20px auto 0;
+}
+.gm .gm-end {
+  padding-top: 40px;
+}
+.gm .modal.bare {
+  position: relative;
+  border: 2px solid #111;
+  padding: 18px;
+}
+.gm .auth-close {
+  position: absolute;
+  z-index: 5;
+  right: 8px;
+  top: 6px;
+  font-size: 24px;
+  background: #fff;
+  border: 1px solid #111;
+  border-radius: 7px;
+  width: 32px;
+  height: 32px;
+}
+.gm .gm-rot {
+  min-width: 8ch;
+}
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -60px;
+  background: #c6f432;
+  color: #111;
+  border: 2px solid #111;
+  padding: 10px;
+  z-index: 50;
+}
+.skip-link:focus {
+  top: 8px;
+}
+@media (max-width: 1200px) {
+  .home-heading {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .app .board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 900px) {
+  .app .sidebar {
+    width: 210px;
+  }
+  .app .workspace {
+    margin-left: 210px;
+    width: calc(100% - 210px);
+  }
+  .app main {
+    padding: 28px 24px 50px;
+  }
+  .home-input,
+  .app .overview-grid {
+    grid-template-columns: 1fr;
+  }
+  .agent-catalog {
+    grid-template-columns: 1fr;
+  }
+  .app .topbar {
+    padding: 14px 24px;
+  }
+  .app .right-rail {
+    display: block;
+  }
+}
+@media (max-width: 650px) {
+  .app .sidebar {
+    width: 100%;
+    position: static;
+    padding: 17px 16px 13px;
+    border-right: 0;
+    border-bottom: 2px solid #111;
+    overflow: visible;
+  }
+  .app-shell {
+    display: block;
+  }
+  .app .brand.logo {
+    font-size: 31px;
+    margin: 0 0 13px;
+    padding: 0;
+  }
+  .app .workspace {
+    margin: 0;
+    width: 100%;
+  }
+  .app .workspace-label,
+  .app .side-heading,
+  .app .side-bottom {
+    display: none;
+  }
+  .app .nav {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 6px;
+    padding: 0 0 7px;
+    scrollbar-width: thin;
+  }
+  .app .nav button {
+    min-width: max-content;
+    min-height: 39px;
+    padding: 7px 10px;
+    font-size: 12px;
+    gap: 7px;
+  }
+  .app .nav button > span {
+    width: auto;
+    font-size: 14px;
+  }
+  .app .nav button b {
+    display: none;
+  }
+  .app .space-list {
+    display: flex;
+    overflow-x: auto;
+    gap: 7px;
+    margin-top: 8px;
+    padding-bottom: 5px;
+  }
+  .app .space-list button {
+    min-width: max-content;
+    padding: 5px 8px;
+    gap: 7px;
+    font-size: 11px;
+  }
+  .app .space-list small {
+    display: none;
+  }
+  .app .space-icon {
+    width: 24px;
+    height: 24px;
+    font-size: 13px;
+  }
+  .app main {
+    padding: 26px 18px 40px;
+  }
+  .app h1 {
+    font-size: 28px;
+  }
+  .app .topbar {
+    padding: 12px 18px;
+    min-height: 58px;
+    align-items: center;
+  }
+  .app .topbar .crumb,
+  .app .topbar .crumb-sep {
+    display: none;
+  }
+  .app .top-meta {
+    gap: 7px;
+  }
+  .app .top-meta > .text-button {
+    font-size: 10px;
+    max-width: 65px;
+  }
+  .app .demo-label {
+    display: none;
+  }
+  .app .decision-count {
+    font-size: 10px;
+  }
+  .app .mobile-settings {
+    display: block;
+  }
+  .home-heading {
+    gap: 17px;
+  }
+  .home-actions {
+    gap: 9px;
+  }
+  .home-actions .primary,
+  .home-actions .secondary {
+    font-size: 12px;
+    padding: 9px 12px;
+  }
+  .home-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    gap: 7px;
+    margin-bottom: 22px;
+  }
+  .home-tabs button {
+    min-width: max-content;
+    font-size: 11px;
+    padding: 8px 10px;
+    gap: 6px;
+  }
+  .app .stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .app .stats > div {
+    padding: 15px 10px;
+  }
+  .app .stats strong {
+    font-size: 26px;
+  }
+  .app .stats small {
+    font-size: 8px;
+  }
+  .app .stats span {
+    font-size: 10px;
+  }
+  .app .board {
+    grid-template-columns: 1fr;
+  }
+  .app .settings-grid,
+  .app .memory-grid {
+    grid-template-columns: 1fr;
+  }
+  .app .task-card h3 {
+    font-size: 15px;
+  }
+  .app .memory-form {
+    display: block;
+  }
+  .app .memory-form > .primary {
+    margin-top: 18px;
+  }
+  .app .memory-form .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .app .message p {
+    font-size: 14px;
+  }
+  .app .run-actions {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .app footer {
+    padding: 16px 18px;
+    font-size: 10px;
+  }
+  .gm-nav {
+    padding: 14px 5vw;
+    gap: 12px;
+  }
+  .gm-logo {
+    font-size: 30px;
+  }
+  .gm-btn {
+    padding: 10px 13px;
+    font-size: 12px;
+  }
+  .gm-link {
+    font-size: 11px;
+  }
+  .gm-hero {
+    padding: 30px 5vw;
+  }
+  .gm-hand {
+    font-size: 20px;
+  }
+  .gm .gm-sub {
+    font-size: 15px;
+  }
+  .gm-for {
+    font-size: 24px;
+  }
+  .gm .gm-sec {
+    padding: 35px 6vw;
+  }
+  .gm .gm-step {
+    padding: 16px;
+    gap: 12px;
+  }
+  .gm .gm-step b {
+    font-size: 17px;
+  }
+  .gm .gm-step p {
+    font-size: 14px;
+  }
+  .gm .phone {
+    margin: 0 auto;
+    width: min(300px, 100%);
+  }
+  .gm .gm-end {
+    padding-top: 20px;
+  }
+  .gm .gm-h2 {
+    font-size: 34px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+.app .decisions-card {
+  background: #eefbc4;
+  border: 2px solid #111;
+  border-radius: 16px;
+  box-shadow: 3px 3px 0 #111;
+  padding: 22px;
+}
+.app .decisions-card h3 {
+  font:
+    700 18px/1.3 Rubik,
+    Inter,
+    sans-serif;
+  color: #111;
+}
+.app .decision-bubble,
+.app .decision-check {
+  background: #c6f432;
+  color: #111;
+  border: 1.5px solid #111;
+}
+.app .decision-empty {
+  font-weight: 600;
+  color: #111;
+}
+.app .task-symbol {
+  background: #ffe14d;
+  border: 1.5px solid #111;
+  border-radius: 10px;
+  color: #111;
+}
+.app .task-symbol.technology {
+  background: #dceaff;
+}
+.app .task-symbol.ride {
+  background: #e7e1ff;
+}
+.app .owner-dot {
+  background: #111;
+}
+.app .agent-row small,
+.app .connection-row b {
+  color: #555;
+}
+.app .plan-placeholder {
+  border-color: #111;
+  color: #555;
+  background: #fff;
+}
+.app .plan-placeholder span {
+  color: #111;
+}
+.app .privacy-note > span {
+  color: #555;
+}
+.app .home-input .decisions-card {
+  min-height: 210px;
+}
+/* Keep the original light sticker palette consistent across all workspace surfaces. */
+:root {
+  --bg: #fbfbf8;
+  --panel: #fff;
+  --sunken: #f3f3ee;
+  --text: #111;
+  --line-strong: #111;
+  --accent-soft: #eefbc4;
+  --accent-text: #111;
+  --faint: #8a8a83;
+  --ok: #16865a;
+  --ok-soft: #e4f6ec;
+  --warn: #9a5b06;
+  --warn-soft: #fdf1dc;
+  --bad: #c3352b;
+  --bad-soft: #fde9e7;
+}
+.agent-catalog .card {
+  background: #fff;
+  color: #111;
+  border: 2px solid #111;
+  box-shadow: 3px 3px 0 #111;
+}
+@media (max-width: 650px) {
+  .app .topbar {
+    flex-wrap: wrap;
+  }
+  .app .demo-label {
+    display: inline-block;
+    max-width: 75px;
+    font-size: 8px;
+    white-space: normal;
+  }
+  .app .conversation .composer {
+    position: sticky;
+    bottom: 12px;
+    z-index: 2;
+  }
+}
+.gm .gm-for {
+  color: #111;
+}
+.app .topbar {
+  height: auto;
+}
+@media (max-width: 650px) {
+  .app .topbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    min-height: 0;
+    gap: 10px;
+  }
+  .app .topbar > .top-meta {
+    flex-wrap: nowrap;
+  }
+  .app .topbar > div:first-child {
+    min-width: 0;
+  }
+}

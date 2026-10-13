@@ -9,7 +9,8 @@
     "demo": "bun scripts/demo.ts",
     "test": "bun test test/",
     "typecheck": "tsc --noEmit",
-    "build": "bun build client/app.tsx --outdir dist --minify"
+    "build": "bun build client/app.tsx --outdir dist --minify",
+    "try": "bun --env-file=.env.live scripts/try.ts"
   },
   "dependencies": {
     "@clerk/backend": "^3.23.2",
