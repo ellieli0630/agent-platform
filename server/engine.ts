@@ -1,5 +1,6 @@
 import {
   db,
+  AudienceChanged,
   first,
   uid,
   time,
@@ -294,7 +295,20 @@ async function finish(run: any, space: any, person: any, text: string) {
     return;
   }
   await db`update gather_runs set status=${status} where id=${run.id}`;
-  await sendMessage(space.id, reply, run.id);
+  try {
+    await sendMessage(
+      space.id,
+      reply,
+      run.id,
+      "assistant",
+      null,
+      space.kind === "private" ? undefined : fresh.audience_version,
+    );
+  } catch (e) {
+    if (!(e instanceof AudienceChanged)) throw e;
+    await shareAgain(fresh, person, reply);
+    return;
+  }
   await event(space.id, run.id, "run_finished", { status });
 }
 export async function decideApproval(
@@ -332,7 +346,20 @@ export async function decideApproval(
       return { changedAudience: true };
     }
     if (decision === "approve") {
-      await sendMessage(s.id, approval.preview, run.id);
+      try {
+        await sendMessage(
+          s.id,
+          approval.preview,
+          run.id,
+          "assistant",
+          null,
+          approval.audience_version,
+        );
+      } catch (e) {
+        if (!(e instanceof AudienceChanged)) throw e;
+        await shareAgain(run, await personById(personId), approval.preview);
+        return { changedAudience: true };
+      }
       const uncertain = await first(
         db`select 1 from gather_executions where run_id=${run.id} and status in ('unknown','started')`,
       );
@@ -385,4 +412,19 @@ export async function traceFor(personId: string, runId: string) {
   demand(run, 404, "Only the permitted person can see this trace.");
   await spaceFor(personId, run.space_id);
   return db`select id,tool,step_id,status,input,output,provider_ref,verified,simulated,created_at from gather_executions where run_id=${run.id} order by created_at`;
+}
+
+async function shareAgain(run: any, person: any, reply: string) {
+  const s = await first(
+    db`select audience_version from gather_spaces where id=${run.space_id}`,
+  );
+  await ask(
+    run,
+    person,
+    "share",
+    digest(`${reply}:${s.audience_version}`),
+    "The group changed. Review sharing with its current members.",
+    reply,
+    s.audience_version,
+  );
 }

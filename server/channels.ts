@@ -140,7 +140,7 @@ export async function syncAudience(spaceId: string) {
     )
   ).audience_version;
 }
-async function inbound(chat: any, message: any) {
+export async function inbound(chat: any, message: any) {
   if (message.direction !== "inbound" || !message.sender) return;
   chats.set(chat.id, chat);
   const phone = String(message.sender.id);
@@ -167,6 +167,12 @@ async function inbound(chat: any, message: any) {
       db`select s.*,a.name agent_name from gather_spaces s join gather_agents a on a.id=s.agent_id where s.id=${id}`,
     );
   }
+  if (space.kind === "private")
+    demand(
+      person.id === space.owner_id && chat.type !== "group",
+      403,
+      "This private conversation belongs to another person.",
+    );
   // A new participant changes the audience before any pending response can be released.
   const joined =
     await db`insert into gather_members(space_id,person_id,role,joined_at) values(${space.id},${person.id},${person.id === space.owner_id ? "owner" : "member"},${time()}) on conflict do nothing returning person_id`;

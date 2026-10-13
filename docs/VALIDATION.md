@@ -3,10 +3,10 @@
 ## Automated checks
 
 - `bun run typecheck`: passed.
-- `bun test test/`: **37 passed, 0 failed, 99 assertions**, using an independent local `gather_test` PostgreSQL database.
+- `bun test test/`: **39 passed, 0 failed, 106 assertions**, using an independent local `gather_test` PostgreSQL database.
 - `bun run build`: passed; native Bun frontend bundle includes the Clerk/React client.
 
-Coverage includes private/shared prompt boundaries, private result trace access, memory corrections/expiry/aliases, concurrent forgetting, group membership, assignee acceptance/completion, dependency cycles/order, step-specific proof, completed-plan immutability, exact approval actor/input, rejection/repeated decisions, audience changes, tainted shared writes, resumable pending calls, uncertain writes, concurrent execution reservations, one-turn simple conversation, unsupported send claims, unfinished plans, job claim/cancellation, inbound deduplication, credential encryption, attachment ownership, research evidence type, single-use invitations, empty answers, expired approvals and approval before sending private results into public searches.
+Coverage includes private/shared prompt boundaries, private result trace access, memory corrections/expiry/aliases, concurrent forgetting, group membership, assignee acceptance/completion, dependency cycles/order, step-specific proof, completed-plan immutability, exact approval actor/input, rejection/repeated decisions, audience changes, tainted shared writes, resumable pending calls, uncertain writes, concurrent execution reservations, one-turn simple conversation, unsupported send claims, unfinished plans, job claim/cancellation, inbound deduplication, credential encryption, attachment ownership, research evidence type, single-use invitations, empty answers, expired approvals and approval before sending private results into public searches, atomic audience checks during message persistence and rejecting outsiders from private iMessage conversations.
 
 Model and provider adapters in this suite are deterministic test doubles. These tests exercise the database, domain logic and runtime, not delivery by Google, Photon, Vapi, Browserbase or an actual phone.
 

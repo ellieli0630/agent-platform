@@ -67,19 +67,30 @@ export async function event(
 ) {
   await db`insert into gather_events(space_id,run_id,type,payload,created_at) values(${spaceId},${runId},${type},${json(payload)}::text::jsonb,${time()})`;
 }
+export class AudienceChanged extends DomainError {
+  constructor() {
+    super(409, "The group changed before this reply could be shared.");
+  }
+}
 export async function sendMessage(
   spaceId: string,
   text: string,
   runId: string | null = null,
   role = "assistant",
   personId: string | null = null,
+  expectedAudience?: number,
 ) {
   const id = uid("msg");
   await db.begin(async (tx) => {
-    await tx`insert into gather_messages(id,space_id,person_id,role,text,run_id,created_at) values(${id},${spaceId},${personId},${role},${text},${runId},${time()})`;
     const s = (
-      await tx`select channel,audience_version from gather_spaces where id=${spaceId}`
+      await tx`select channel,audience_version from gather_spaces where id=${spaceId} for update`
     )[0];
+    if (
+      expectedAudience !== undefined &&
+      s?.audience_version !== expectedAudience
+    )
+      throw new AudienceChanged();
+    await tx`insert into gather_messages(id,space_id,person_id,role,text,run_id,created_at) values(${id},${spaceId},${personId},${role},${text},${runId},${time()})`;
     if (role === "assistant" && s?.channel === "imessage")
       await tx`insert into gather_outbox(id,space_id,message_id,text,audience_version,created_at) values(${uid("out")},${spaceId},${id},${text},${s.audience_version},${time()})`;
   });

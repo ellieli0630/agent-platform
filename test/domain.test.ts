@@ -24,6 +24,7 @@ const {
   seal,
   unseal,
   spaceFor,
+  sendMessage,
 } = await import("../server/store");
 const memory = await import("../server/memory");
 const plans = await import("../server/plans");
@@ -779,4 +780,48 @@ test("private results cannot be sent to a public search provider without exact r
   expect((await first(db`select * from gather_approvals`)).approver_id).toBe(
     "alex",
   );
+});
+
+test("message persistence rejects a stale approved audience atomically", async () => {
+  const r = await run();
+  await db`update gather_spaces set audience_version=2 where id='family'`;
+  await expect(
+    sendMessage("family", "Private reviewed reply", r.id, "assistant", null, 1),
+  ).rejects.toThrow("group changed");
+  expect(
+    await db`select * from gather_messages where role='assistant'`,
+  ).toHaveLength(0);
+  expect(await db`select * from gather_outbox`).toHaveLength(0);
+  await sendMessage(
+    "family",
+    "Freshly reviewed reply",
+    r.id,
+    "assistant",
+    null,
+    2,
+  );
+  expect(
+    (await db`select * from gather_messages where role='assistant'`)[0].text,
+  ).toBe("Freshly reviewed reply");
+});
+
+test("an iMessage sender cannot join someone else’s private conversation", async () => {
+  await db`update gather_people set phone='+15550000002' where id='daniel'`;
+  await db`update gather_spaces set external_id='private-chat',channel='imessage' where id='private'`;
+  const channels = await import("../server/channels");
+  await expect(
+    channels.inbound(
+      { id: "private-chat", type: "group" },
+      {
+        id: "unexpected",
+        direction: "inbound",
+        sender: { id: "+15550000002" },
+        content: { type: "text", text: "Read the private history" },
+      },
+    ),
+  ).rejects.toThrow("private conversation");
+  expect(
+    await db`select * from gather_members where space_id='private' and person_id='daniel'`,
+  ).toHaveLength(0);
+  expect(await db`select * from gather_runs`).toHaveLength(0);
 });
